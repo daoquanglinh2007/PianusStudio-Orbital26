@@ -1,5 +1,5 @@
 .community-page {
-  /* height: 300vh; */
+  height: auto; 
   background-image: url("/Home.png");
   background-repeat: no-repeat;
   background-size: cover;
