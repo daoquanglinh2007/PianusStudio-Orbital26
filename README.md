@@ -1,103 +1,498 @@
-# 🎹 Pianus Studio - Orbital 2026
+# 🎹 Pianus Studio — Orbital 2026
+
 *By **Nguyen Khanh Duong** & **Dao Quang Linh***
 
-<br>
-<br>
+A virtual piano you play with your computer keyboard — simulator, guided lessons,
+scoring mode, pitch-recognition drills, recordings and a community forum.
 
-## 🚀 Proposed Level of Achievement:
+* 🌐 **Live site:** [pianus-studio-orbital26.vercel.app](https://pianus-studio-orbital26.vercel.app/)
+* 🎬 **Demo video:** [https://youtu.be/OEWCI49M6Nc](https://www.youtube.com/watch?v=Nk4Y8JQCDDc)
 
-**Apollo 11** 
+---
 
-<br>
+## Table of contents
 
-## 🌐 Deployed Link to Our Website:
+1. [Tech stack](#tech-stack)
+2. [Prerequisites](#prerequisites)
+3. [Project structure](#project-structure)
+4. [Quick start](#quick-start)
+5. [Backend setup](#backend-setup-fastapi--port-8000)
+6. [Frontend setup](#frontend-setup-vite--react--port-5173)
+7. [Environment variables](#environment-variables)
+8. [Supabase setup](#supabase-setup)
+9. [Running tests](#running-tests)
+10. [Troubleshooting](#troubleshooting)
+11. [API reference](#api-reference)
+12. [Deployment](#deployment)
 
-* **[Pianus Studio](https://pianus-studio-orbital26.vercel.app/)** 
-* [**Demo**](https://youtu.be/OEWCI49M6Nc) by our admin
+---
 
-<br>
+## Tech stack
 
-## 🔥 Motivation:
+| Layer | Technology |
+| :-- | :-- |
+| Frontend | Vite 8, React 19, React Router 7, Tone.js |
+| Backend | FastAPI, Uvicorn, Pydantic |
+| Database & Auth | Supabase (PostgreSQL, Auth, Storage) |
+| Testing | Vitest, React Testing Library, jsdom |
+| Hosting | Vercel (frontend), Render (backend) |
 
-Have you ever watched a pianist glide effortlessly across the keys, and wondered what it would feel like to create that kind of magic yourself? Yet at the same time, making the choice can be a big move.
+---
 
-Becoming a pianist can be a difficult choice for anyone. Piano is an instrument that requires a lot of patience, time and effort to practice. The cost of buying and learning piano can be somewhat heavy. The piano can take up quite some space at your home too. <br>
+## Prerequisites
 
-But what if i tell you that you can try all that without spending a single penny?
+| Tool | Version | Check with |
+| :-- | :-- | :-- |
+| **Node.js** | 20.19+ or 22.12+ (CI uses 24) | `node --version` |
+| **npm** | 10+ | `npm --version` |
+| **Python** | **3.10 or newer** | `python --version` |
+| **Git** | any recent | `git --version` |
 
-Welcome to Pianus Studio, where your computer’s keyboard is the piano keys so you no longer need a grand instrument to begin your journey — all you need is your passion and curiosity.<br> 
+> **Python 3.10 is a hard minimum.** `backend/schemas.py` uses the `str | None`
+> union syntax, which is a syntax error on 3.9 and below.
 
-Unlike guitars, pianos are not instruments we can simply carry everywhere we go. If you love the piano but cannot always be near one, Pianus Studio is here for you. Whether you want to practice, discover melodies, or simply enjoy the beauty of music, Pianus Studio brings the piano closer to you — anytime, anywhere, completely free.
+You will also need a **Supabase project** — see [Supabase setup](#supabase-setup).
 
-<br>
+---
 
+## Project structure
 
-## User Stories:
+```
+PianusStudio-Orbital26/
+├── .github/workflows/
+│   └── vitest.yml               # CI: runs the frontend test suite on push/PR
+│
+├── backend/                     # FastAPI service → http://localhost:8000
+│   ├── main.py                  # All 22 API routes + CORS config
+│   ├── database.py              # Supabase client (reads .env)
+│   ├── schemas.py               # Pydantic request/response models
+│   ├── requirements.txt
+│   ├── render.yaml              # Render deployment config
+│   ├── setup.sh                 # Reference commands (Windows paths — see note below)
+│   └── .env                     # ← you create this (git-ignored)
+│
+└── frontend/                    # Vite + React app → http://localhost:5173
+    ├── index.html               # Vite entry HTML
+    ├── vite.config.js           # Vite + Vitest config
+    ├── eslint.config.js
+    ├── vercel.json              # SPA rewrite for client-side routing
+    ├── package.json
+    ├── public/                  # Static assets: backgrounds, piece art, piano decorations
+    ├── src/
+    │   ├── main.jsx             # React entry point
+    │   ├── App.jsx              # Route table
+    │   ├── index.css            # Global styles
+    │   ├── App.css              # (unused Vite starter styles)
+    │   ├── assets/
+    │   ├── webpages/            # Route-level pages (HomePage, Scoring, Community, …)
+    │   ├── components/          # Shared components, Supabase client, API helper
+    │   │   └── Pieces/          # P1–P12: one module per piano piece
+    │   ├── classes/             # Note, Piece, Piece_simplified, Record, AudioRecord
+    │   │   └── __tests__/       # Vitest suites
+    │   ├── hooks/               # usePiano, useKeyboard, useRequireAuth
+    │   ├── styles/              # Per-page CSS
+    │   └── test/setup.js        # Vitest setup
+    └── .env                     # ← you create this (git-ignored)
+```
 
-* As a person who cannot afford a piano (mainly due to time and space constraints), I want to have a certain familiarity with the piano keyboard using this virtual piano website.
-* As a piano enthusiast, I want to learn some basic piano songs.
-* As a piano player, I believe that a perfect pitch will significantly contribute to my musical ability. Hence, I want to train my ears by doing several pitch recognition exercises.
-* As a user, I want to listen to my playing back and forth, so the recording feature will be useful.
-* As a user, I want to save all of my progress (of learning piano songs and doing pitch recognition exercises) in my personal account.
-* As a user, I want to see how good I am compared to other users.
+**You need two terminals running at once** — one for the backend, one for the
+frontend.
 
-<br>
+---
 
-## 🏰 Proposed Features:
+## Quick start
 
->### Simulator that simulates a real-life piano
+Already have your `.env` files and dependencies installed? Then it's just:
 
-When the user holds down a particular note, the corresponding piano sound will be created, and the following visual effects will be created:
-* The piano key itself changes its color
-* A rectangular bar will appear from the top of the key and grow taller. However, since the bottom of that rectangular bar is fixed, only the top edge keeps climbing higher and higher the longer you hold the key. <br>
+```bash
+# Terminal 1 — backend
+cd backend
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+uvicorn main:app --reload        # → http://localhost:8000
 
-Conversely, when that note is released, the simulator stops displaying the piano sound, and the following visual effects will be created:
-* The piano key changed back to its original color
-* The rectangular bar stops growing and floats upward like a bubble until it disappears off the screen. <br>
+# Terminal 2 — frontend
+cd frontend
+npm run dev                      # → http://localhost:5173
+```
 
-For better understanding, please watch the video of an user played “Twinkle, Twinkle, Little Star” on Pianus Studio: **[Twinkle Twinkle Little Star](https://www.youtube.com/watch?v=y1AhHW2RyyM)** 
-<br>
+First time through? Follow the two sections below.
 
->### Piano lessons through beginner-friendly piano pieces
-*We will add a collection of beginner-friendly piano pieces for users to learn (the pieces in the collection will be decided later). As part of the users’ learning process, they have to know how to play that piece correctly. That’s why displaying mode will be included. That is, Pianus Studio can automatically play a piece of our collection from start to end (take the “Twinkle, Twinkle, Little Star” video as an example).*
+---
 
->### Pitch recognition exercises
-*We will add a collection of pitch recognition exercises. For each exercise, Pianus Studio plays a sequence of notes or a chord without showing visually which notes are being played. To pass that exercise, the user must replay exactly every note that Pianus Studio played. Notice that the notes in exercises can be randomly generated (which may make users harder to pass).*
+## Backend setup (FastAPI → port 8000)
 
->### Learning mode
-*For every piece of our collection, a learning mode will be added. That is, the piece will be broken down into notes or chords. Pianus Studio shows each step visually and waits for the user to replicate it correctly before advancing, starting from the first chord of the piece.*
+### 1. Create a virtual environment
 
->### Scoring mode
-*For every piece in our collection, a scoring mode will be added in addition to the learning mode. That is, the user will play the piece from start to end, and Pianus Studio will grade that performance based on how close it is to the sample performance (in the displaying mode). The details on how the grading system works will be decided by our team later.*
-> ### Private accounts
-* Users can create private accounts that keep track of the completeness of every pitch recognition exercise, as well as their scores in every piece in our collection.
-* Users will be able to create freestyle piano songs. The recordings of their playing can be saved to their personal accounts, but we will limit the time that they can record.
-* Several leaderboards will be created to rank users based on several aspects: the number of pitch recognition exercises completed and the maximum score a user can achieve on a particular piece (in scoring mode).
+From the **`backend/`** folder:
 
-<br>
+```bash
+cd backend
+python -m venv .venv
+```
 
-## 🖥️ Tech Stack:
-Our team will use **HTML**, **CSS**, **Vite & React** for the frontend and **Supabase**, **Fastapi**, and **PostgreSQL** for the backend.
+> If `python` isn't found, try `python3` (common on macOS/Linux).
 
-<br>
+### 2. Activate it
 
-## 📈 Current Progress:
+The activation path differs by platform — this is the single most common
+stumbling block:
 
-Up to now, we have created four pages on our websites: home, piano simulator, about us and contact us. The piano-simulator page already showed a decent virtual piano with sufficient effects shown in feature 1.
+| Platform | Command |
+| :-- | :-- |
+| **macOS / Linux** | `source .venv/bin/activate` |
+| **Windows — PowerShell** | `.venv\Scripts\Activate.ps1` |
+| **Windows — CMD** | `.venv\Scripts\activate.bat` |
+| **Windows — Git Bash** | `source .venv/Scripts/activate` |
 
-<br>
+You'll know it worked when your prompt is prefixed with `(.venv)`.
 
-## ⏱️ Development Plan:
+> **Note:** the existing `backend/setup.sh` hard-codes `.venv/Scripts/activate`,
+> which is the **Windows** path. On macOS or Linux use `.venv/bin/activate`.
 
-| <div style="width:400px">Target</div>  | Deadline |
-| :----   | :----  | 
-|  Finish the Liftoff poster and video. | By 16th May |
-|  <div style="width:400px">Pick up the necessary tech stack and implement the 1st feature - Piano Simulator</div> | By 1st June |
-| <div style="width:400px">Implement a register/login page with database & Add the first piano piece to our collection with display mode available - Feature 2</div> | By 10th June |
-| Add several simple pitch-recognition exercises - Feature 3 | By 17th June |
-| <div style="width:400px">Add two more piano pieces to our collection & Implement the learning mode for all three pieces - Feature 4</div> | By 29th June |
-| <div style="width:400px">Implement the scoring mode for all three pieces in our piece collection - Feature 5</div> | By 6th July |
-| <div style="width:400px">Improve the database so that it satisfies feature 6 & Complete the collection of pitch recognition exercises (by adding some more complex exercises)</div> | By 13th July |
-| <div style="width:400px">Implement feature 7 + improve the database to support saving users’ recordings</div> | By 20th July |
-| <div style="width:400px">Implement the leaderboards (feature 8) & Optimize the UI/UX design of the whole page & Test, debug the whole Pianus Studio</div> | By 27th July |
+> **PowerShell blocking the script?** Run once, in that terminal:
+> `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
 
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Create `backend/.env`
+
+See [Environment variables](#environment-variables). **The server will not start
+without it.**
+
+### 5. Run the server
+
+```bash
+uvicorn main:app --reload
+```
+
+`--reload` restarts the server automatically whenever you edit a `.py` file.
+Leave this terminal running.
+
+You should see:
+
+```
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Application startup complete.
+```
+
+**Verify it works:** open <http://localhost:8000/docs> for the interactive
+Swagger UI. All 22 endpoints should be listed.
+
+Want a different port? `uvicorn main:app --reload --port 8001` — but then you
+must also update `VITE_API_URL` in the frontend **and** add the new origin to the
+`origins` list in `main.py`.
+
+### Leaving the venv
+
+```bash
+deactivate
+```
+
+---
+
+## Frontend setup (Vite + React → port 5173)
+
+### 1. Install dependencies
+
+From the **`frontend/`** folder:
+
+```bash
+cd frontend
+npm install
+```
+
+> Use plain `npm install`, not the individual `npm install tone react-router-dom …`
+> lines in `frontend/setup.sh`. Everything is already declared in
+> `package.json`, and installing packages one at a time can pull versions that
+> don't match `package-lock.json`.
+>
+> For a clean, reproducible install that matches the lockfile exactly, use
+> `npm ci`.
+
+### 2. Create `frontend/.env`
+
+See [Environment variables](#environment-variables).
+
+### 3. Run the dev server
+
+```bash
+npm run dev
+```
+
+You should see:
+
+```
+  VITE v8.0.16  ready in 576 ms
+  ➜  Local:   http://localhost:5173/
+```
+
+Open <http://localhost:5173>.
+
+> **Port 5173 matters.** The backend's CORS policy in `main.py` only allows
+> `http://localhost:5173`. If Vite falls back to 5174 because 5173 is occupied,
+> every API call fails with a CORS error. Free the port, or run
+> `npm run dev -- --port 5173 --strictPort` so Vite fails loudly instead of
+> quietly switching.
+
+### Other frontend commands
+
+| Command | What it does |
+| :-- | :-- |
+| `npm run dev` | Dev server with hot reload |
+| `npm run build` | Production build into `dist/` |
+| `npm run preview` | Serve the built `dist/` locally |
+| `npm run lint` | ESLint |
+| `npm run test` | Vitest in watch mode |
+| `npm run test:run` | Vitest once (what CI runs) |
+| `npm run coverage` | Vitest with a coverage report |
+
+---
+
+## Environment variables
+
+Both files are already listed in `.gitignore` — **never commit them.**
+
+### `backend/.env`
+
+Create a file at **`backend/.env`**:
+
+```dotenv
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_SERVICE_KEY=your-service-role-key
+```
+
+| Variable | Where to find it |
+| :-- | :-- |
+| `SUPABASE_URL` | Supabase dashboard → **Project Settings → API → Project URL** |
+| `SUPABASE_SERVICE_KEY` | Same page → **Project API keys → `service_role`** |
+
+> ⚠️ **The `service_role` key bypasses all Row Level Security.** It must only
+> ever live in the backend. Never put it in the frontend, never commit it, never
+> paste it into a screenshot. If it leaks, rotate it immediately from the
+> Supabase dashboard.
+
+### `frontend/.env`
+
+Create a file at **`frontend/.env`**:
+
+```dotenv
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-public-key
+VITE_API_URL=http://localhost:8000
+```
+
+| Variable | Notes |
+| :-- | :-- |
+| `VITE_SUPABASE_URL` | Same URL as the backend's `SUPABASE_URL` |
+| `VITE_SUPABASE_ANON_KEY` | The **`anon` / `public`** key — *not* `service_role` |
+| `VITE_API_URL` | Your local backend. **No trailing slash** |
+
+Two rules that catch people out:
+
+1. **The `VITE_` prefix is mandatory.** Vite only exposes variables beginning
+   with `VITE_` to browser code. A frontend variable named `SUPABASE_URL` will
+   silently be `undefined`.
+2. **Restart the dev server after editing `.env`.** Vite reads env files at
+   startup only; hot reload will not pick up the change.
+
+`VITE_API_URL` has no trailing slash because `API.jsx` builds request URLs by
+string concatenation:
+
+```js
+fetch(`${import.meta.env.VITE_API_URL}${path}`)   // path already starts with "/"
+```
+
+A trailing slash would give you `http://localhost:8000//user`.
+
+---
+
+## Supabase setup
+
+If you're joining the project and have been handed credentials for the existing
+Supabase project, paste them into the two `.env` files and skip this section.
+To stand up your own instance, you'll need the following.
+
+### Tables
+
+| Table | Purpose |
+| :-- | :-- |
+| `users_data` | Profile: `id`, `username`, `role`, `avatar_url`, `bio`, `binding_option`, `first_record`, `second_record`, `third_record`, `created_at` |
+| `scoring_data` | Per-piece scores: `user_id`, `user_name`, `piece_number`, `current_score`, `top_score`, `changed_at` |
+| `records` | Saved keyboard performances |
+| `forum_posts` | Community posts: `title`, `description`, `record1`, `record2`, `title_record1`, `created_at` |
+| `forum_comments` | Comments, keyed to a post |
+
+`users_data.id` is a foreign key to Supabase's built-in `auth.users.id`.
+
+### Storage
+
+Create a **public** bucket named **`avatars`**. `POST /user/avatar` uploads to
+`{user_id}/avatar.{ext}` and accepts `.jpg`, `.jpeg` and `.png` only.
+
+### Auth
+
+Enable **Email** sign-in under **Authentication → Providers**. For local
+development, add `http://localhost:5173` under
+**Authentication → URL Configuration → Redirect URLs**, or the password-reset
+flow will redirect to production instead of your machine.
+
+---
+
+## Running tests
+
+```bash
+cd frontend
+npm run test:run       # single run — what CI does
+npm run test           # watch mode
+npm run coverage       # with coverage
+```
+
+Current suite: **32 tests across 4 files**, covering the `Note`, `Piece`,
+`Record` and `AudioRecord` classes. CI runs on every push and PR to `main` via
+`.github/workflows/vitest.yml`.
+
+The backend has `pytest` installed but no test files yet.
+
+---
+
+## Troubleshooting
+
+### `SupabaseException: supabase_url is required`
+
+The backend crashes the moment you start it. `backend/.env` is missing, is in the
+wrong folder, or has a typo in a variable name.
+
+Check the file is at `backend/.env` (**not** the repo root) and that both keys
+are spelled exactly `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`. Run `uvicorn` from
+*inside* `backend/` — `load_dotenv()` looks in the current working directory.
+
+### `ModuleNotFoundError: No module named 'fastapi'`
+
+The venv isn't active, or dependencies aren't installed. Look for `(.venv)` in
+your prompt; if it's missing, re-activate. Then `pip install -r requirements.txt`.
+
+### CORS error in the browser console
+
+Something like *"has been blocked by CORS policy"*. The frontend isn't on port
+5173. Check what Vite actually printed — if it says 5174, port 5173 was already
+taken. Free it, or add your real origin to `origins` in `main.py`.
+
+### Frontend loads but every API call fails
+
+Confirm the backend terminal is still running, and that `VITE_API_URL` is
+`http://localhost:8000` with **no trailing slash**. Check the backend is alive at
+<http://localhost:8000/docs>.
+
+### `supabaseUrl is required` in the browser console
+
+`frontend/.env` is missing, or its variables lack the `VITE_` prefix. Restart
+`npm run dev` after fixing — Vite only reads `.env` at startup.
+
+### `401 Unauthorized` from the API
+
+Expected when signed out; protected routes need a Supabase session token. Sign in
+through the UI. If it persists while logged in, your frontend and backend are
+probably pointed at *different* Supabase projects — the project URL in both
+`.env` files must match.
+
+### Port already in use
+
+```bash
+# macOS / Linux
+lsof -ti:8000 | xargs kill -9
+lsof -ti:5173 | xargs kill -9
+```
+
+```powershell
+# Windows (PowerShell)
+netstat -ano | findstr :8000
+taskkill /PID <pid> /F
+```
+
+### `npm install` fails or behaves oddly
+
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Note: the stray `packpage.json`
+
+There's a misspelled `packpage.json` in the repo root. Nothing uses it — the real
+manifest is `frontend/package.json`. Don't run `npm install` from the repo root.
+
+---
+
+## API reference
+
+Base URL in development: `http://localhost:8000`
+Interactive docs: <http://localhost:8000/docs>
+
+Routes marked 🔒 require an `Authorization: Bearer <supabase-access-token>`
+header, which `apiFetch()` in `src/components/API.jsx` attaches automatically.
+The rest are public reads.
+
+**Profile**
+
+| | Method | Route | Purpose |
+| :-- | :-- | :-- | :-- |
+| 🔒 | `GET` | `/user` | Current user's profile |
+| 🔒 | `PUT` | `/user` | Update username / bio / avatar URL |
+| 🔒 | `POST` | `/user/avatar` | Upload avatar image (jpg/jpeg/png) |
+| 🔒 | `GET` | `/user/binding-option` | Current keyboard binding preset |
+| 🔒 | `PUT` | `/user/binding-option` | Change keyboard binding preset |
+| | `GET` | `/profile/{username}` | Public profile by username |
+| | `GET` | `/profile-by-id/{user_id}` | Public profile by user id |
+
+**Scores & leaderboard**
+
+| | Method | Route | Purpose |
+| :-- | :-- | :-- | :-- |
+| 🔒 | `GET` | `/user/scores` | All of the user's piece scores |
+| 🔒 | `GET` | `/user/score/{pieceNumber}` | Score for one piece |
+| 🔒 | `PUT` | `/user/score/{pieceNumber}` | Submit a score for a piece |
+| | `GET` | `/leaderboard/{pieceNumber}` | Top 20 for a piece |
+
+**Recordings**
+
+| | Method | Route | Purpose |
+| :-- | :-- | :-- | :-- |
+| 🔒 | `POST` | `/record` | Save a recording |
+| 🔒 | `GET` | `/records` | List the user's recordings |
+| 🔒 | `GET` | `/record/{position}` | Fetch recording in slot 1–3 |
+| 🔒 | `DELETE` | `/record/{position}` | Delete a recording slot |
+| | `GET` | `/record-by-id/{record_id}` | Fetch a recording by id |
+
+**Pitch-recognition exercises**
+
+| | Method | Route | Purpose |
+| :-- | :-- | :-- | :-- |
+| 🔒 | `GET` | `/exercise` | Exercise scores |
+| 🔒 | `PUT` | `/exercise/{id}` | Submit an exercise score |
+
+**Community forum**
+
+| | Method | Route | Purpose |
+| :-- | :-- | :-- | :-- |
+| 🔒 | `POST` | `/post` | Create a forum post |
+| 🔒 | `POST` | `/post/comment` | Add a comment |
+| | `GET` | `/posts` | List forum posts |
+| | `GET` | `/comments/{post_id}` | Comments on a post |
+
+---
+
+## Deployment
+
+| Part | Platform | Config |
+| :-- | :-- | :-- |
+| Frontend | Vercel | `frontend/vercel.json` — SPA rewrite so client-side routes resolve |
+| Backend | Render | `backend/render.yaml` — `uvicorn main:app --host 0.0.0.0 --port $PORT` |
+
+Set the same environment variables in each platform's dashboard. In production,
+`VITE_API_URL` points at the deployed Render URL, and that frontend origin must
+be present in the `origins` list in `main.py`.
