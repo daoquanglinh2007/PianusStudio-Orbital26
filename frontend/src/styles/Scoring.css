@@ -336,7 +336,7 @@
 .scoring-piano {
   position: relative;
   display: block;
-  width: 80%;
+  width: fit-content;
   height: 568px;
   margin: 20px auto;
   border: 10px solid;
@@ -619,7 +619,6 @@
   position: relative;
   z-index: 1;
   display: block;
-  width: 100%;
   width: calc(22 * (var(--white-key-width) + var(--white-key-gap)) - var(--white-key-gap));
   height: 390px;
   overflow: hidden;

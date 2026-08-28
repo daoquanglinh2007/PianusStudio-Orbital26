@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 38.8889rem;
+  min-height: 700px;
   margin: 0;
   background-image: url("/SettingsPage.png");
   background-position: top;
@@ -13,12 +13,12 @@
 
 .settings-page .settings-return-btn {
   position: absolute;
-  top: 0.5556rem;
-  left: 0.5556rem;
+  top: 10px;
+  left: 10px;
   align-items: center;
-  padding: 0.2222rem 0.3889rem 0.3333rem;
-  border: 0.1111rem solid rgb(110, 74, 20);
-  border-radius: 0.4444rem;
+  padding: 4px 7px 6px;
+  border: 2px solid rgb(110, 74, 20);
+  border-radius: 8px;
   font-family: "Amadeus", cursive;
   font-weight: bold;
   color: #fefefe;
@@ -39,11 +39,11 @@
 }
 
 .settings-page h1 {
-  padding: 1.6667rem;
+  padding: 30px;
   font-family: "Amadeus", cursive;
-  font-size: 5rem;
+  font-size: 90px;
   font-weight: bold;
-  text-shadow: 0 0.1111rem 0.4444rem rgba(0,0,0,0.4);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
   color: #e7a53c;
 }
 
@@ -52,24 +52,24 @@
   flex-direction: column;
   box-sizing: border-box;
   width: 100%;
-  max-width: 50rem;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 1.3333rem 1.7778rem;
-  border: 0.3333rem solid #563407;
-  border-radius: 1.1111rem;
+  padding: 24px 32px;
+  border: 6px solid #563407;
+  border-radius: 20px;
   font-family: "Amadeus", cursive;
   font-weight: bold;
   color: #000000;
   background-color: #fefefe8e;
-  backdrop-filter: blur(0.2222rem);
+  backdrop-filter: blur(4px);
 }
 
 .settings-page .settings-container button {
-  margin-right: 0.4444rem;
-  margin-left: 0.4444rem;
+  margin-right: 8px;
+  margin-left: 8px;
   border: none;
   font-family: "Amadeus", cursive;
-  font-size: 1.5rem;
+  font-size: 27px;
   font-weight: bold;
   text-decoration: underline;
   background: transparent;
@@ -87,10 +87,10 @@
 }
 
 .settings-page .settings-container .settings-save-btn {
-  padding: 0.2222rem 0.8889rem;
-  border: 0.1111rem solid #1a5c3a !important;
-  border-radius: 0.4444rem;
-  font-size: 1.2rem;
+  padding: 4px 16px;
+  border: 2px solid #1a5c3a !important;
+  border-radius: 8px;
+  font-size: 21.6px;
   text-decoration: none;
   color: #fff;
   background: #3cb87a;
@@ -107,32 +107,32 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 0.4444rem;
-  margin-top: 0.8333rem;
-  margin-bottom: 0.8333rem;
+  gap: 8px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .settings-page .property-name {
-  margin-right: 4.4444rem;
-  font-size: 2rem;
+  margin-right: 80px;
+  font-size: 36px;
 }
 
 .settings-page .property-current-option {
-  min-width: 5.5556rem;
-  font-size: 1.5rem;
+  min-width: 100px;
+  font-size: 27px;
   text-align: center;
 }
 
 .settings-page p.property-saved-option {
   position: relative;
-  top: 0.5556rem;
+  top: 10px;
 }
 
 .settings-page img {
   position: relative;
-  top: 1.3889rem;
+  top: 25px;
   width: 100%;
-  max-width: 44.4444rem;
+  max-width: 800px;
   height: auto;
 }
 
@@ -150,20 +150,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.1111rem;
+  gap: 20px;
   width: 100%;
-  max-width: 23.8889rem;
-  padding: 1.6667rem;
-  border-radius: 0.6667rem;
+  max-width: 430px;
+  padding: 30px;
+  border-radius: 12px;
   text-align: center;
   background: #ffffff;
-  box-shadow: 0 0.5556rem 1.6667rem rgba(0, 0, 0, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 .settings-save-modal p {
   margin: 0;
   font-family: "Amadeus", cursive;
-  font-size: 1rem;
+  font-size: 18px;
   font-weight: bold;
   color: #555;
 }
