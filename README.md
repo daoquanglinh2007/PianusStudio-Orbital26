@@ -6,7 +6,7 @@ A virtual piano you play with your computer keyboard — simulator, guided lesso
 scoring mode, pitch-recognition drills, recordings and a community forum.
 
 * 🌐 **Live site:** [pianus-studio-orbital26.vercel.app](https://pianus-studio-orbital26.vercel.app/)
-* 🎬 **Demo video:** [https://youtu.be/OEWCI49M6Nc](https://www.youtube.com/watch?v=Nk4Y8JQCDDc)
+* 🎬 **Demo video:** [https://youtu.be/Nk4Y8JQCDDc](https://www.youtube.com/watch?v=Nk4Y8JQCDDc)
 
 ---
 
